@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=Shift_JIS">
+  <meta http-equiv="Content-Script-Type" content="text/javascript">
+  <meta name="Keywords" content="webMIDIAPI,WebMidiApi,webmidiapi">
+  <title><%= title %></title>
+  <link rel='stylesheet' href='/stylesheets/style.css' ></link>
+  <link rel="import" href="/bower_components/x-webmidi/x-webmidirequestaccess.html" ></link>
+  <script type="text/javascript" src="/bower_components/jquery/dist/jquery.js" ></script>
+  <script type="text/javascript" src="/socket.io/socket.io.js"></script>
+  <script type="text/javascript" src="/javascripts/socket.io.midi.js" ></script>
+</head>
+<body>
+<x-webmidirequestaccess sysex="false" input="true" output="true"></x-webmidirequestaccess>
+
+<h1><%= title %></h1>
+<p>Welcome to <%= title %></p>
+
+<x-webmidiinput id="foo-input" autoreselect="true"></x-webmidiinput>
+<div id="result">(Result Area)</div>
+
+<br />
+<script type="text/javascript">
+  window.addEventListener('midiin-event:foo-input', handleMIDIMessage1);
+
+  function handleMIDIMessage1( event ) {
+    var out=[];
+    var text=document.querySelector("#result").innerHTML;
+
+    var channel = event.detail.data[0] & 0xf0;
+    var data1 = event.detail.data[1];
+    var data2 = event.detail.length>1?0:event.detail.data[2];
+    switch (channel){
+      case 0x80://note off(1000nnnn)
+        out.push("note off "+data1+"."+data2);
+        noteOff(data1);
+        break;
+      case 0x90://note on(1001nnnn)
+        out.push("note on "+data1+"."+data2);
+        if(data2 > 0){
+          noteOn(data1, data2);
+        }else{
+          noteOff(data1);
+        }
+        break;
+      case 0xA0://Polyphonic Key Pressure(1010nnnn)
+        out.push("Polyphonic Key Pressure "+data1+"."+data2);
+        break;
+      case 0xB0://Control Change(1011nnnn)
+        out.push("Control Change "+data1+"."+data2);
+        break;
+      case 0xC0://Program Change(1100nnnn)
+        out.push("Program Change "+data1);
+        break;
+      case 0xD0://Channel Pressure(1101nnnn)
+        out.push("Channel Pressure "+data1);
+        channelPressure(data1);
+        break;
+      case 0xE0://Pitch Bend Change(1110nnnn)
+        out.push("Pitch Bend Change "+data1+"."+data2);
+        break;
+      default :
+        out.push("0x"+("00"+event.detail.data[i].toString(16)).substr(-2));
+
+    }
+
+    document.querySelector("#result").innerHTML=out.join(" ")+"<br>"+text;
+  }
+
+  startMidiClient();
+</script>
+</body>
+
+</html>

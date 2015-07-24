@@ -1,0 +1,20 @@
+{
+  "name": "scratchmidi",
+  "version": "0.0.0",
+  "authors": [
+    "yokmama <hijirinhijirin@gmail.com>"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "public/bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "x-webmidi": "~0.10.2",
+    "jquery": "~2.1.4"
+  }
+}
